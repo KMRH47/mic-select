@@ -20,4 +20,4 @@ cd macos/raycast && npm install && npm run build
 
 **Linux**: Open Ulauncher (`Ctrl+Space`), type `mic `, select microphone.
 
-**macOS**: Open Raycast (`Cmd+Space`), search "List Microphones" or "Switch Microphone".
+**macOS**: Open Raycast (`Cmd+Space`), type `mic `, select microphone.

@@ -15,13 +15,15 @@
       "name": "list",
       "title": "List Microphones",
       "description": "List and switch between audio input sources",
-      "mode": "view"
+      "mode": "view",
+      "keywords": ["mic", "microphone"]
     },
     {
       "name": "switch",
       "title": "Switch Microphone",
       "description": "Quick switch to a microphone",
-      "mode": "view"
+      "mode": "view",
+      "keywords": ["mic", "microphone"]
     }
   ],
   "dependencies": {
