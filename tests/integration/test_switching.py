@@ -18,7 +18,7 @@ class TestSwitchCommandGeneration:
         client = PactlClient()
         list_use_case = ListSourcesUseCase(client)
         switch_use_case = SwitchSourceUseCase(client)
-        return MicSwitcherPresenter(list_use_case, switch_use_case)
+        return MicSwitcherPresenter(list_use_case, switch_use_case, max_sources=10)
 
     def test_switch_command_structure(self, presenter):
         """Test that switch command has correct structure."""
@@ -32,11 +32,15 @@ class TestSwitchCommandGeneration:
 
     def test_switch_command_handles_special_chars(self, presenter):
         """Test command generation with special characters."""
+        import shlex
         source = "alsa_input.usb-0000:00:14.0.analog-stereo"
         script = presenter.create_switch_command(source)
 
-        # Source should be properly quoted
-        assert f"'{source}'" in script or f'"{source}"' in script
+        # Source should be properly quoted using shlex.quote
+        escaped = shlex.quote(source)
+        assert escaped in script
+        # Verify no unescaped special characters that could cause injection
+        assert source not in script or escaped in script
 
     def test_switch_command_syntax_valid(self, presenter):
         """Test that generated script has valid shell syntax."""

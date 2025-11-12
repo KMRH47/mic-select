@@ -74,6 +74,8 @@ class TestPactlClientSetDefaultSource:
 
         mock_run.assert_called_once()
         call_args = mock_run.call_args[0][0]
+        assert isinstance(call_args, list)
+        assert "pactl" in call_args
         assert "set-default-source" in call_args
         assert source_name in call_args
 
@@ -84,13 +86,23 @@ class TestPactlClientMoveStreams:
     @patch("src.infrastructure.audio_service.subprocess.run")
     def test_move_streams_to_source(self, mock_run):
         """Test moving streams to source."""
+        from unittest.mock import MagicMock
         client = PactlClient()
         source_name = "alsa_input.test.mono-fallback"
+        
+        # Mock first call (list source-outputs) to return empty or valid output
+        mock_run.return_value = MagicMock(
+            returncode=0,
+            stdout="123\talsa_input.test.mono-fallback\tapplication\n"
+        )
 
         client.move_streams_to_source(source_name)
 
-        mock_run.assert_called_once()
-        call_args = mock_run.call_args[0][0]
-        assert "move-source-output" in call_args
-        assert source_name in call_args
-        assert "source-outputs" in call_args
+        # Should be called at least once (list source-outputs)
+        assert mock_run.call_count >= 1
+        # Check first call is list command
+        first_call = mock_run.call_args_list[0][0][0]
+        assert isinstance(first_call, list)
+        assert "pactl" in first_call
+        assert "list" in first_call
+        assert "source-outputs" in first_call

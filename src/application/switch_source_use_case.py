@@ -1,5 +1,8 @@
 """Use case for switching audio source."""
+import logging
 from src.infrastructure.audio_service import AudioSystemClient
+
+logger = logging.getLogger(__name__)
 
 
 class SwitchSourceUseCase:
@@ -21,5 +24,6 @@ class SwitchSourceUseCase:
         if not source_name or not source_name.strip():
             raise ValueError("Source name cannot be empty")
         
+        logger.info(f"Switching to audio source: {source_name}")
         self._audio_client.set_default_source(source_name)
         self._audio_client.move_streams_to_source(source_name)

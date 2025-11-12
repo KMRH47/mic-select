@@ -15,11 +15,17 @@ class ListSourcesUseCase:
         
         Args:
             query: Optional search query to filter sources
-            limit: Maximum number of sources to return
+            limit: Maximum number of sources to return (must be > 0)
             
         Returns:
             Filtered and limited list of audio sources
+            
+        Raises:
+            ValueError: If limit is less than 1
         """
+        if limit < 1:
+            raise ValueError("limit must be greater than 0")
+        
         sources = self._audio_client.list_sources()
         
         if query:

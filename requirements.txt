@@ -1,0 +1,3 @@
+# Runtime dependencies for Mic Switcher Ulauncher Extension
+# Ulauncher API (provided by Ulauncher runtime environment)
+# No additional runtime dependencies required
