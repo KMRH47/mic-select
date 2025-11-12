@@ -28,19 +28,17 @@ class MicSwitcherPresenter:
         self._max_sources = max_sources
         self._notification_expire_time = notification_expire_time
     
-    def create_switch_command(self, source_name: str) -> str:
+    def create_switch_command(self, source_name: str, display_name: str = "") -> str:
         """Create command script to switch source."""
-        # Properly escape source_name to prevent shell injection
         escaped_name = shlex.quote(source_name)
-        safe_display_name = shlex.quote(source_name[:50])
+        safe_display_name = shlex.quote((display_name or source_name)[:50])
         
-        # Generate script that executes the switch
         return f"""pactl set-default-source {escaped_name} 2>&1 && \
 for stream_id in $(pactl list short source-outputs 2>/dev/null | cut -f1); do
     if [ -n "$stream_id" ]; then
         pactl move-source-output "$stream_id" {escaped_name} 2>&1 || true
     fi
-done && (notify-send 'Microphone Changed' 'Switched to: {safe_display_name}' --expire-time={self._notification_expire_time} 2>/dev/null || true)"""
+done && notify-send 'Microphone Changed' {safe_display_name} --icon=audio-input-microphone --expire-time={self._notification_expire_time}"""
     
     def present_sources(self, query: str) -> RenderResultListAction:
         """
@@ -72,10 +70,10 @@ done && (notify-send 'Microphone Changed' 'Switched to: {safe_display_name}' --e
                 items.append(
                     ExtensionResultItem(
                         icon="icon.png",
-                        name=source.name,
+                        name=source.display_name(),
                         description="Set as default microphone",
                         on_enter=RunScriptAction(
-                            self.create_switch_command(source.name),
+                            self.create_switch_command(source.name, source.display_name()),
                             None
                         ),
                     )

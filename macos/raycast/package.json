@@ -3,7 +3,7 @@
   "name": "select-mic",
   "title": "Select Microphone",
   "description": "Switch between audio input sources",
-  "icon": "icon.png",
+  "icon": "../../assets/icon.svg",
   "author": "KMRH47",
   "categories": [
     "Productivity",

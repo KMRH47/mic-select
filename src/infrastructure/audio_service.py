@@ -32,10 +32,10 @@ class PactlClient:
         self.move_stream_timeout = move_stream_timeout
     
     def list_sources(self) -> AudioSourceList:
-        """List audio input sources."""
+        """List audio input sources with descriptions."""
         try:
             result = subprocess.run(
-                ["timeout", str(self.timeout), "pactl", "list", "short", "sources"],
+                ["timeout", str(self.timeout), "pactl", "list", "sources"],
                 capture_output=True,
                 text=True,
                 timeout=self.timeout + 0.05
@@ -50,12 +50,30 @@ class PactlClient:
                 return AudioSourceList([])
             
             sources = []
-            for idx, line in enumerate(result.stdout.splitlines()):
-                parts = line.split("\t")
-                if len(parts) >= 2:
-                    source_name = parts[1].strip()
-                    if source_name:
-                        sources.append(AudioSource(name=source_name, index=idx))
+            current_source = {}
+            
+            for line in result.stdout.splitlines():
+                line = line.rstrip()
+                
+                if line.startswith("Source #"):
+                    if current_source.get("name"):
+                        sources.append(AudioSource(
+                            name=current_source["name"],
+                            index=current_source.get("index", len(sources)),
+                            description=current_source.get("description", "")
+                        ))
+                    current_source = {"index": len(sources)}
+                elif line.startswith("\tName: "):
+                    current_source["name"] = line.split("Name: ", 1)[1].strip()
+                elif line.startswith("\tDescription: "):
+                    current_source["description"] = line.split("Description: ", 1)[1].strip()
+            
+            if current_source.get("name"):
+                sources.append(AudioSource(
+                    name=current_source["name"],
+                    index=current_source.get("index", len(sources)),
+                    description=current_source.get("description", "")
+                ))
             
             return AudioSourceList(sources).filter_monitors()
         except subprocess.TimeoutExpired:

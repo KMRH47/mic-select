@@ -6,7 +6,7 @@ from dataclasses import dataclass
 class Config:
     """Extension configuration."""
     # Timeout for pactl commands (seconds)
-    pactl_timeout: float = 0.15
+    pactl_timeout: float = 0.3
     
     # Timeout for setting default source (seconds)
     set_source_timeout: float = 0.5
@@ -18,7 +18,7 @@ class Config:
     max_sources_display: int = 10
     
     # Notification expiration time (milliseconds)
-    notification_expire_time: int = 1500
+    notification_expire_time: int = 800
     
     def __post_init__(self):
         """Validate configuration values."""

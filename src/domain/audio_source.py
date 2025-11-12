@@ -8,14 +8,20 @@ class AudioSource:
     """Represents an audio input source."""
     name: str
     index: int
+    description: str = ""
     
     def is_monitor(self) -> bool:
         """Check if this is a monitor source."""
         return "monitor" in self.name.lower()
     
     def matches_query(self, query: str) -> bool:
-        """Check if source name matches search query."""
-        return query.lower() in self.name.lower()
+        """Check if source name or description matches search query."""
+        query_lower = query.lower()
+        return query_lower in self.name.lower() or query_lower in self.description.lower()
+    
+    def display_name(self) -> str:
+        """Get user-friendly display name."""
+        return self.description if self.description else self.name
 
 
 @dataclass(frozen=True)

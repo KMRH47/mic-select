@@ -1,13 +1,12 @@
 .PHONY: install uninstall test test-unit test-integration test-coverage clean format lint type-check check install-raycast build-raycast test-macos
 
 EXTENSION_DIR := $(HOME)/.local/share/ulauncher/extensions/mic-switcher.kmrh47
-ICON_URL := https://cdn-icons-png.flaticon.com/512/107/107831.png
 
 install:
 	@mkdir -p $(EXTENSION_DIR)
-	@cp manifest.json main.py $(EXTENSION_DIR)/
+	@cp linux/ulauncher/manifest.json main.py $(EXTENSION_DIR)/
 	@cp -r src $(EXTENSION_DIR)/
-	@[ -f $(EXTENSION_DIR)/icon.png ] || wget -q -O $(EXTENSION_DIR)/icon.png $(ICON_URL) 2>/dev/null || true
+	@cp assets/icon.svg $(EXTENSION_DIR)/icon.png
 	@echo "Installed. Restart Ulauncher: killall ulauncher && ulauncher &"
 
 uninstall:
