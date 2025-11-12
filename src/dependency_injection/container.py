@@ -1,7 +1,8 @@
 """Dependency injection container."""
+import sys
 from typing import Optional
 from src.config import Config
-from src.infrastructure.audio_service import PactlClient, AudioSystemClient
+from src.infrastructure.audio_service import AudioSystemClient, PactlClient
 from src.application.list_sources_use_case import ListSourcesUseCase
 from src.application.switch_source_use_case import SwitchSourceUseCase
 from src.presentation.ulauncher_adapter import MicSwitcherPresenter
@@ -20,11 +21,22 @@ class Container:
     def audio_client(self) -> AudioSystemClient:
         """Get audio system client."""
         if self._audio_client is None:
-            self._audio_client = PactlClient(
-                timeout=self._config.pactl_timeout,
-                set_source_timeout=self._config.set_source_timeout,
-                move_stream_timeout=self._config.move_stream_timeout
-            )
+            if sys.platform.startswith("linux"):
+                self._audio_client = PactlClient(
+                    timeout=self._config.pactl_timeout,
+                    set_source_timeout=self._config.set_source_timeout,
+                    move_stream_timeout=self._config.move_stream_timeout
+                    )
+            else:
+                try:
+                    from src.infrastructure.platform import get_audio_client
+                    self._audio_client = get_audio_client(self._config)
+                except (ImportError, RuntimeError):
+                    self._audio_client = PactlClient(
+                        timeout=self._config.pactl_timeout,
+                        set_source_timeout=self._config.set_source_timeout,
+                        move_stream_timeout=self._config.move_stream_timeout
+                    )
         return self._audio_client
     
     def list_sources_use_case(self) -> ListSourcesUseCase:
