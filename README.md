@@ -16,7 +16,7 @@ make install
 
 ## Use
 
-Open Raycast, type `List Microphones` or `Switch Microphone`.
+Open Raycast, type `mic` to list/switch microphones.
 
 ## Uninstall
 

@@ -2,17 +2,17 @@
 
 # Required parameters:
 # @raycast.schemaVersion 1
-# @raycast.title Switch Microphone
+# @raycast.title mic
 # @raycast.mode fullOutput
-# @raycast.packageName Audio
+# @raycast.packageName System
 
 # Optional parameters:
 # @raycast.icon 🎤
-# @raycast.argument1 { "type": "text", "placeholder": "Microphone name" }
 
 # Documentation:
-# @raycast.description Switch to a different microphone
+# @raycast.description List and switch microphones
 # @raycast.author KMRH47
+# @raycast.argument1 { "type": "text", "placeholder": "Mic name (leave empty to list)", "optional": true }
 
 # Get script directory and find Python CLI
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -39,5 +39,9 @@ if [ -z "$PYTHON" ]; then
     exit 1
 fi
 
-# Switch microphone
-"$PYTHON" "$CLI_PATH" switch --name "$1"
+# If argument provided, switch to that mic, otherwise list all
+if [ -n "$1" ]; then
+    "$PYTHON" "$CLI_PATH" switch --name "$1"
+else
+    "$PYTHON" "$CLI_PATH" list --limit 50
+fi
