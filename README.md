@@ -4,17 +4,11 @@ Switch microphone input sources on Linux (Ulauncher) and macOS (Raycast).
 
 ## Installation
 
-### Linux
 ```bash
 make install
 ```
 
-### macOS
-```bash
-brew install switchaudio-osx
-pip install -r requirements.txt
-cd macos/raycast && npm install && npm run build
-```
+Automatically detects your OS and installs the appropriate version (Linux/Ulauncher or macOS/Raycast).
 
 ## Usage
 
