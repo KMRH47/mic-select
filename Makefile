@@ -1,4 +1,4 @@
-.PHONY: install install-linux install-macos uninstall test test-unit test-integration test-coverage clean format lint type-check check install-raycast build-raycast test-macos
+.PHONY: install install-linux install-macos uninstall uninstall-linux uninstall-macos test test-unit test-integration test-coverage clean format lint type-check check install-raycast build-raycast test-macos
 
 UNAME := $(shell uname)
 EXTENSION_DIR := $(HOME)/.local/share/ulauncher/extensions/mic-switcher.kmrh47
@@ -39,11 +39,44 @@ install-macos:
 	@cd macos/raycast && npm install
 	@echo "Building Raycast extension..."
 	@cd macos/raycast && npm run build
-	@echo "Installation complete! Import 'macos/raycast' directory in Raycast preferences."
+	@echo "Linking extension to Raycast..."
+	@RAYCAST_EXT_DIR="$$HOME/Library/Application Support/com.raycast.macos/extensions"; \
+	EXT_SOURCE="$$(cd macos/raycast && pwd)"; \
+	mkdir -p "$$RAYCAST_EXT_DIR"; \
+	EXT_LINK="$$RAYCAST_EXT_DIR/select-mic"; \
+	if [ -L "$$EXT_LINK" ] || [ -d "$$EXT_LINK" ]; then \
+		rm -rf "$$EXT_LINK"; \
+	fi; \
+	ln -sf "$$EXT_SOURCE" "$$EXT_LINK"; \
+	echo "Installation complete! Extension is ready in Raycast."; \
+	echo "Opening Raycast preferences to activate the extension..."; \
+	open -a Raycast 2>/dev/null || true; \
+	sleep 1; \
+	osascript -e 'tell application "System Events" to tell process "Raycast" to keystroke "," using command down' 2>/dev/null || true
 
 uninstall:
+	@if [ "$(UNAME)" = "Linux" ]; then \
+		$(MAKE) uninstall-linux; \
+	elif [ "$(UNAME)" = "Darwin" ]; then \
+		$(MAKE) uninstall-macos; \
+	else \
+		echo "Unsupported OS: $(UNAME)"; \
+		exit 1; \
+	fi
+
+uninstall-linux:
 	@rm -rf $(EXTENSION_DIR)
 	@echo "Uninstalled"
+
+uninstall-macos:
+	@RAYCAST_EXT_DIR="$$HOME/Library/Application Support/com.raycast.macos/extensions"; \
+	EXT_LINK="$$RAYCAST_EXT_DIR/select-mic"; \
+	if [ -L "$$EXT_LINK" ] || [ -d "$$EXT_LINK" ]; then \
+		rm -rf "$$EXT_LINK"; \
+		echo "Raycast extension uninstalled."; \
+	else \
+		echo "Extension not found in Raycast."; \
+	fi
 
 install-raycast:
 	@echo "Installing Raycast extension dependencies..."
