@@ -1,92 +1,40 @@
-.PHONY: install install-linux install-macos uninstall uninstall-linux uninstall-macos test test-unit test-integration test-coverage clean format lint type-check check install-raycast build-raycast test-macos
+.PHONY: install uninstall test test-unit test-integration test-coverage clean format lint type-check check build-raycast test-macos
 
+# OS detection
 UNAME := $(shell uname)
-EXTENSION_DIR := $(HOME)/.local/share/ulauncher/extensions/mic-switcher.kmrh47
 
+# Universal installer - detects OS and runs appropriate script
 install:
 	@if [ "$(UNAME)" = "Linux" ]; then \
-		$(MAKE) install-linux; \
+		./scripts/install-linux.sh; \
 	elif [ "$(UNAME)" = "Darwin" ]; then \
-		$(MAKE) install-macos; \
+		./scripts/install-macos.sh; \
 	else \
-		echo "Unsupported OS: $(UNAME)"; \
+		echo "Error: Unsupported OS: $(UNAME)"; \
+		echo "Supported: Linux (Ulauncher), macOS (Raycast)"; \
 		exit 1; \
 	fi
 
-install-linux:
-	@echo "Installing for Linux (Ulauncher)..."
-	@mkdir -p $(EXTENSION_DIR)
-	@cp linux/ulauncher/manifest.json main.py $(EXTENSION_DIR)/
-	@cp -r src $(EXTENSION_DIR)/
-	@cp assets/icon.svg $(EXTENSION_DIR)/icon.png
-	@echo "Installed. Restart Ulauncher: killall ulauncher && ulauncher &"
-
-install-macos:
-	@echo "Installing for macOS (Raycast)..."
-	@if ! command -v brew >/dev/null 2>&1; then \
-		echo "Error: Homebrew not found. Install from https://brew.sh"; \
-		exit 1; \
-	fi
-	@if ! brew list switchaudio-osx >/dev/null 2>&1; then \
-		echo "Installing switchaudio-osx via Homebrew..."; \
-		brew install switchaudio-osx; \
-	else \
-		echo "switchaudio-osx already installed"; \
-	fi
-	@echo "Installing Python dependencies..."
-	@pip install -r requirements.txt
-	@echo "Installing Raycast extension dependencies..."
-	@cd macos/raycast && npm install
-	@echo "Building Raycast extension..."
-	@cd macos/raycast && npm run build
-	@echo "Linking extension to Raycast..."
-	@RAYCAST_EXT_DIR="$$HOME/Library/Application Support/com.raycast.macos/extensions"; \
-	EXT_SOURCE="$$(cd macos/raycast && pwd)"; \
-	mkdir -p "$$RAYCAST_EXT_DIR"; \
-	EXT_LINK="$$RAYCAST_EXT_DIR/select-mic"; \
-	if [ -L "$$EXT_LINK" ] || [ -d "$$EXT_LINK" ]; then \
-		rm -rf "$$EXT_LINK"; \
-	fi; \
-	ln -sf "$$EXT_SOURCE" "$$EXT_LINK"; \
-	echo "Installation complete! Extension is ready in Raycast."; \
-	echo "Opening Raycast preferences to activate the extension..."; \
-	open -a Raycast 2>/dev/null || true; \
-	sleep 1; \
-	osascript -e 'tell application "System Events" to tell process "Raycast" to keystroke "," using command down' 2>/dev/null || true
-
+# Universal uninstaller
 uninstall:
 	@if [ "$(UNAME)" = "Linux" ]; then \
-		$(MAKE) uninstall-linux; \
+		./scripts/uninstall-linux.sh; \
 	elif [ "$(UNAME)" = "Darwin" ]; then \
-		$(MAKE) uninstall-macos; \
+		./scripts/uninstall-macos.sh; \
 	else \
-		echo "Unsupported OS: $(UNAME)"; \
+		echo "Error: Unsupported OS: $(UNAME)"; \
 		exit 1; \
 	fi
 
-uninstall-linux:
-	@rm -rf $(EXTENSION_DIR)
-	@echo "Uninstalled"
-
-uninstall-macos:
-	@RAYCAST_EXT_DIR="$$HOME/Library/Application Support/com.raycast.macos/extensions"; \
-	EXT_LINK="$$RAYCAST_EXT_DIR/select-mic"; \
-	if [ -L "$$EXT_LINK" ] || [ -d "$$EXT_LINK" ]; then \
-		rm -rf "$$EXT_LINK"; \
-		echo "Raycast extension uninstalled."; \
-	else \
-		echo "Extension not found in Raycast."; \
-	fi
-
-install-raycast:
-	@echo "Installing Raycast extension dependencies..."
-	@cd macos/raycast && npm install
-	@echo "Building Raycast extension..."
-	@cd macos/raycast && npm run build
-	@echo "Raycast extension ready. Import the 'macos/raycast' directory in Raycast preferences."
-
+# Build Raycast extension (macOS only)
 build-raycast:
-	@cd macos/raycast && npm run build
+	@if [ "$(UNAME)" != "Darwin" ]; then \
+		echo "Error: Raycast is only available on macOS"; \
+		exit 1; \
+	fi
+	@echo "Building Raycast extension..."
+	@cd macos/raycast && npm install --silent && npm run build
+	@echo "✓ Build complete"
 
 test:
 	@.venv/bin/pytest

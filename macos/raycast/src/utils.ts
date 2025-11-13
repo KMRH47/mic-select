@@ -5,10 +5,10 @@ import { join } from "path";
 
 // Calculate path to CLI script relative to extension root
 function getCliScriptPath(): string {
-  // In Raycast, __dirname points to the compiled JS location
-  // We need to go up to the project root, then to macos/cli
+  // In Raycast, __dirname points to the compiled JS location in dist/src
+  // The CLI script should be bundled in the extension root as raycast_cli.py
   const extensionRoot = __dirname.replace(/\/dist\/src$/, "").replace(/\/src$/, "");
-  return join(extensionRoot, "..", "macos", "cli", "raycast_cli.py");
+  return join(extensionRoot, "raycast_cli.py");
 }
 
 const CLI_SCRIPT_PATH = getCliScriptPath();

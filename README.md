@@ -1,17 +1,25 @@
-# Select Microphone
+# Mic Switcher
 
-Switch microphone input sources on Linux (Ulauncher) and macOS (Raycast).
+Quick microphone switcher.
 
-## Installation
+Works for:
+- **macOS**: Raycast
+- **Linux**: Ulauncher
+
+## Install
 
 ```bash
 make install
 ```
 
-Automatically detects your OS and installs the appropriate version (Linux/Ulauncher or macOS/Raycast).
+**macOS**: Import extension in Raycast (path shown after install).
 
-## Usage
+## Use
 
-**Linux**: Open Ulauncher (`Ctrl+Space`), type `mic `, select microphone.
+Open launcher, type `mic`, select microphone.
 
-**macOS**: Open Raycast (`Cmd+Space`), type `mic `, select microphone.
+## Uninstall
+
+```bash
+make uninstall
+```

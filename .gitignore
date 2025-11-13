@@ -4,7 +4,6 @@ __pycache__/
 *$py.class
 *.so
 .Python
-build/
 develop-eggs/
 dist/
 downloads/
@@ -28,7 +27,7 @@ env/
 
 # Testing
 .pytest_cache/
-.coverage
+.coverage*
 htmlcov/
 .tox/
 .hypothesis/
@@ -54,3 +53,12 @@ Thumbs.db
 
 # Project specific
 *.log
+
+# Node.js (Raycast extension)
+node_modules/
+package-lock.json
+
+# Raycast build artifacts
+macos/raycast/dist/
+macos/raycast/raycast-env.d.ts
+macos/raycast/raycast_cli.py
