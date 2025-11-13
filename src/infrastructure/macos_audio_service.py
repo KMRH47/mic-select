@@ -3,21 +3,27 @@ import subprocess
 import shutil
 from typing import Optional
 from src.domain.audio_source import AudioSource, AudioSourceList
+from src.infrastructure.audio_router_daemon import AudioRouterDaemon
 
 logger = logging.getLogger(__name__)
 
 
 class MacOSAudioClient:
     
-    def __init__(self, timeout: float = 0.5, set_source_timeout: float = 1.0):
+    def __init__(self, timeout: float = 0.5, set_source_timeout: float = 1.0, use_virtual_routing: bool = False):
         self.timeout = timeout
         self.set_source_timeout = set_source_timeout
+        self.use_virtual_routing = use_virtual_routing
         self._switch_audio_source_path = self._find_switch_audio_source()
+        self._daemon: Optional[AudioRouterDaemon] = None
         
         if not self._switch_audio_source_path:
             raise RuntimeError(
                 "SwitchAudioSource not found. Install via: brew install switchaudio-osx"
             )
+        
+        if use_virtual_routing:
+            self._daemon = AudioRouterDaemon()
     
     def _find_switch_audio_source(self) -> Optional[str]:
         paths = [
@@ -91,5 +97,9 @@ class MacOSAudioClient:
             raise RuntimeError(f"Error switching audio source: {e}")
     
     def move_streams_to_source(self, source_name: str) -> None:
-        logger.debug(f"move_streams_to_source called for '{source_name}' (no-op on macOS)")
-        pass
+        if self.use_virtual_routing and self._daemon:
+            try:
+                self._daemon.switch_source(source_name)
+                logger.info(f"Routed {source_name} to virtual device")
+            except Exception as e:
+                logger.error(f"Failed to route audio: {e}")
