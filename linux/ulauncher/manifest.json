@@ -4,7 +4,7 @@
   "description": "Quickly switch microphone input using PipeWire/PulseAudio",
   "developer_name": "KMRH47",
   "icon": "icon.png",
-  "id": "mic-switcher.kmrh47",
+  "id": "mic-switcher",
   "preferences": [
     {
       "id": "keyword",

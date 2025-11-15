@@ -3,7 +3,7 @@
 
 set -e
 
-EXTENSION_DIR="$HOME/.local/share/ulauncher/extensions/mic-switcher.kmrh47"
+EXTENSION_DIR="$HOME/.local/share/ulauncher/extensions/mic-switcher"
 
 echo "Installing for Linux (Ulauncher)..."
 
